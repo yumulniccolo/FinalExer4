@@ -18,5 +18,21 @@
         android:id="@+id/fragmentGame"
         android:name="com.example.finalexer4.FragmentGame"
         android:label="fragment_game"
-        tools:layout="@layout/fragment_game" />
+        tools:layout="@layout/fragment_game" >
+        <action
+            android:id="@+id/action_fragmentGame_to_gameOverFragment"
+            app:destination="@id/gameOverFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameOverFragment"
+        android:name="com.example.finalexer4.GameOverFragment"
+        android:label="fragment_game_over"
+        tools:layout="@layout/fragment_game_over" >
+        <action
+            android:id="@+id/action_gameOverFragment_to_fragmentGame"
+            app:destination="@id/fragmentGame" />
+        <action
+            android:id="@+id/action_gameOverFragment_to_fragmentMenu"
+            app:destination="@id/fragmentMenu" />
+    </fragment>
 </navigation>
