@@ -54,7 +54,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front"
@@ -85,7 +86,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front1"
@@ -116,7 +118,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front2"
@@ -147,7 +150,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front3"
@@ -178,7 +182,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front4"
@@ -209,7 +214,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front5"
@@ -240,7 +246,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front6"
@@ -271,7 +278,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp"/>
 
             <ImageView
                 android:id="@+id/hole_front7"
@@ -302,7 +310,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="0dp" />
+                android:translationY="-11dp"
+                android:translationX="5dp" />
 
             <ImageView
                 android:id="@+id/hole_front8"
