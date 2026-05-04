@@ -14,8 +14,9 @@
 
     public class GameOverFragment extends Fragment {
 
-        private int score = 0;
-        private String difficulty = "Medium";
+    private int score = 0;
+    private int imposterHits = 0;
+    private String difficulty = "Medium";
 
         public GameOverFragment() {
             // Required empty public constructor
@@ -27,6 +28,7 @@
             if (getArguments() != null) {
                 score = getArguments().getInt("score", 0);
                 difficulty = getArguments().getString("difficulty", "Medium");
+                imposterHits = getArguments().getInt("imposterHits", 0);
             }
         }
 
@@ -42,6 +44,17 @@
 
             TextView tvScore = view.findViewById(R.id.textView4);
             tvScore.setText("Score: " + score);
+
+            TextView tvImposterHits = view.findViewById(R.id.tvImposterHits);
+
+            if ("Easy".equalsIgnoreCase(difficulty)) {
+                if (tvImposterHits != null) tvImposterHits.setVisibility(View.GONE);
+            } else {
+                if (tvImposterHits != null) {
+                    tvImposterHits.setVisibility(View.VISIBLE);
+                    tvImposterHits.setText("Imposter: " + imposterHits);
+                }
+            }
 
             Button btnReplay = view.findViewById(R.id.btn_replay);
             Button btnMenu = view.findViewById(R.id.btn_menu);
