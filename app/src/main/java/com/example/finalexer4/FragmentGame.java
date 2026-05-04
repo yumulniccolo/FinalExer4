@@ -1,5 +1,6 @@
 package com.example.finalexer4;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -26,8 +27,8 @@ public class FragmentGame extends Fragment {
 
     private String difficulty;
     private int score = 0;
-    private long gameSpeed = 1500; // Delay between spawns
-    private long moleStayTime = 1000; // How long they stay up
+    private long gameSpeed = 1500;
+    private long moleStayTime = 1000;
 
     private TextView tvScore, tvTime;
     private ImageView[] moles = new ImageView[9];
@@ -39,9 +40,9 @@ public class FragmentGame extends Fragment {
     private Random random = new Random();
     private boolean isGameActive = true;
 
-    public FragmentGame() {
-        // Required empty public constructor
-    }
+    private MediaPlayer gameMusic;
+
+    public FragmentGame() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,6 @@ public class FragmentGame extends Fragment {
         tvScore = view.findViewById(R.id.tvScore);
         tvTime = view.findViewById(R.id.tvTime);
 
-        // Initialize moles
         moles[0] = view.findViewById(R.id.mole);
         moles[1] = view.findViewById(R.id.mole1);
         moles[2] = view.findViewById(R.id.mole2);
@@ -86,8 +86,6 @@ public class FragmentGame extends Fragment {
         moles[6] = view.findViewById(R.id.mole6);
         moles[7] = view.findViewById(R.id.mole7);
         moles[8] = view.findViewById(R.id.mole8);
-
-        //float hideY = 200 * getResources().getDisplayMetrics().density;
 
         for (int i = 0; i < 9; i++) {
             final int index = i;
@@ -104,10 +102,15 @@ public class FragmentGame extends Fragment {
                 if (isMoleUp[index]) {
                     score++;
                     tvScore.setText("Score: " + score);
-                    hideMole(index); // click = go down + score
+                    hideMole(index);
                 }
             });
         }
+
+        // Start game music
+        gameMusic = MediaPlayer.create(requireContext(), R.raw.game);
+        gameMusic.setLooping(true);
+        gameMusic.start();
 
         setupDifficulty();
         startGame();
@@ -210,6 +213,13 @@ public class FragmentGame extends Fragment {
         if (handler != null) handler.removeCallbacksAndMessages(null);
         if (countDownTimer != null) countDownTimer.cancel();
 
+        // Stop game music
+        if (gameMusic != null) {
+            gameMusic.stop();
+            gameMusic.release();
+            gameMusic = null;
+        }
+
         Bundle bundle = new Bundle();
         bundle.putInt("score", score);
         bundle.putString("difficulty", difficulty);
@@ -232,6 +242,13 @@ public class FragmentGame extends Fragment {
 
         if (countDownTimer != null) {
             countDownTimer.cancel();
+        }
+
+        // Stop game music
+        if (gameMusic != null) {
+            gameMusic.stop();
+            gameMusic.release();
+            gameMusic = null;
         }
     }
 }
