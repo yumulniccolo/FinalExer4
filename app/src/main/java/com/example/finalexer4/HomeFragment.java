@@ -1,10 +1,11 @@
 package com.example.finalexer4;
 
+import android.annotation.SuppressLint;
 import android.media.AudioAttributes;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,8 +21,6 @@ public class HomeFragment extends Fragment {
     private int startSoundId;
     private boolean soundLoaded = false;
 
-    private MediaPlayer homeMusic;
-
     public HomeFragment() {}
 
     @Override
@@ -30,19 +29,16 @@ public class HomeFragment extends Fragment {
         return inflater.inflate(R.layout.homepage, container, false);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Home background music
-        homeMusic = MediaPlayer.create(requireContext(), R.raw.home);
-        homeMusic.setLooping(true);
-        homeMusic.start();
-
-        // SoundPool para sa start button sound
+        // SoundPool setup with low latency flags
         AudioAttributes attributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setFlags(AudioAttributes.FLAG_LOW_LATENCY)
                 .build();
 
         soundPool = new SoundPool.Builder()
@@ -57,18 +53,18 @@ public class HomeFragment extends Fragment {
 
         Button btnStart = view.findViewById(R.id.playbtn);
 
-        btnStart.setOnClickListener(v -> {
-            if (soundLoaded) soundPool.play(startSoundId, 1f, 1f, 0, 0, 1f);
+        // Use OnTouchListener for an "instant" click feel
+        btnStart.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                // Play sound immediately
+                if (soundLoaded) soundPool.play(startSoundId, 1f, 1f, 1, 0, 1f);
 
-            // Stop home music bago mag-navigate
-            if (homeMusic != null) {
-                homeMusic.stop();
-                homeMusic.release();
-                homeMusic = null;
+                // Navigate immediately
+                Navigation.findNavController(v)
+                        .navigate(R.id.action_homeFragment_to_fragmentMenu);
+                return true;
             }
-
-            Navigation.findNavController(v)
-                    .navigate(R.id.action_homeFragment_to_fragmentMenu);
+            return false;
         });
     }
 
@@ -78,11 +74,6 @@ public class HomeFragment extends Fragment {
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
-        }
-        if (homeMusic != null) {
-            homeMusic.stop();
-            homeMusic.release();
-            homeMusic = null;
         }
     }
 }

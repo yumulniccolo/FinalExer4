@@ -1,5 +1,6 @@
 package com.example.finalexer4;
 
+import android.annotation.SuppressLint;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
@@ -8,9 +9,9 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
 import java.util.Random;
@@ -50,7 +50,6 @@ public class FragmentGame extends Fragment {
     private SoundPool soundPool;
     private int hitSoundId;
     private boolean hitSoundLoaded = false;
-
     private int timesUpSoundId;
     private boolean timesUpSoundLoaded = false;
 
@@ -72,6 +71,7 @@ public class FragmentGame extends Fragment {
         return inflater.inflate(R.layout.fragment_game, container, false);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -106,14 +106,15 @@ public class FragmentGame extends Fragment {
         moles[7] = view.findViewById(R.id.mole7);
         moles[8] = view.findViewById(R.id.mole8);
 
-        // Setup SoundPool
+        // Setup SoundPool with high priority attributes
         AudioAttributes attributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setFlags(AudioAttributes.FLAG_LOW_LATENCY)
                 .build();
 
         soundPool = new SoundPool.Builder()
-                .setMaxStreams(3)
+                .setMaxStreams(5)
                 .setAudioAttributes(attributes)
                 .build();
 
@@ -129,38 +130,69 @@ public class FragmentGame extends Fragment {
 
         for (int i = 0; i < 9; i++) {
             final int index = i;
-
             FrameLayout hole = (FrameLayout) moles[i].getParent();
 
             hole.post(() -> {
                 float hideY = moles[index].getHeight();
+                if (hideY == 0) hideY = 500; 
                 moles[index].setTranslationY(hideY);
                 isMoleUp[index] = false;
             });
 
-            View.OnClickListener clickListener = v -> {
-                if (isMoleUp[index]) {
-                    if (isImposter[index]) {
-                        score = Math.max(0, score - 5);
-                        imposterHits++;
-                        showImposterHitMessage();
-                        updateImposterStats();
-                    } else {
-                        score++;
-                    }
-                    tvScore.setText("Score: " + score);
-                    if (hitSoundLoaded) soundPool.play(hitSoundId, 1f, 1f, 0, 0, 1f);
-                    hideMole(index);
-                }
-            };
+            // Use OnTouchListener for INSTANT response on touch down (faster than OnClick)
+            moles[i].setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (isMoleUp[index]) {
+                        // 1. DISABLE MOLE IMMEDIATELY so it can't be clicked twice
+                        isMoleUp[index] = false;
 
-            moles[i].setOnClickListener(clickListener);
+                        // 2. Play sound IMMEDIATELY
+                        if (hitSoundLoaded) {
+                            soundPool.play(hitSoundId, 1f, 1f, 1, 0, 1f);
+                        }
+
+                        // 3. Game logic
+                        if (isImposter[index]) {
+                            score = Math.max(0, score - 5);
+                            imposterHits++;
+                            showImposterHitMessage();
+                            updateImposterStats();
+                        } else {
+                            score++;
+                        }
+                        tvScore.setText("Score: " + score);
+
+                        // 4. "Pop" Feedback: Shrink slightly and drop down faster
+                        moles[index].animate().cancel(); // Stop current "up" animation
+                        moles[index].animate()
+                                .scaleX(0.9f)
+                                .scaleY(0.9f)
+                                .translationY(moles[index].getHeight())
+                                .setDuration(150) // Faster drop for hits
+                                .withEndAction(() -> {
+                                    moles[index].setScaleX(1f);
+                                    moles[index].setScaleY(1f);
+                                });
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
 
-        // Start game music
-        gameMusic = MediaPlayer.create(requireContext(), R.raw.game);
-        gameMusic.setLooping(true);
-        gameMusic.start();
+        // Initialize music in background thread to avoid UI hang
+        new Thread(() -> {
+            try {
+                gameMusic = MediaPlayer.create(requireContext(), R.raw.game);
+                if (gameMusic != null) {
+                    gameMusic.setLooping(true);
+                    gameMusic.setVolume(0.5f, 0.5f); // Lower volume to help SFX stand out
+                    gameMusic.start();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
 
         setupDifficulty();
         startGame();
@@ -189,7 +221,7 @@ public class FragmentGame extends Fragment {
         };
         handler.post(gameRunnable);
 
-        countDownTimer = new CountDownTimer(60000, 1000) {
+        countDownTimer = new CountDownTimer(30000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 tvTime.setText("Time: " + (millisUntilFinished / 1000));
@@ -204,14 +236,13 @@ public class FragmentGame extends Fragment {
     }
 
     private void showRandomMole() {
+        if (!isGameActive) return;
         int index = random.nextInt(9);
         if (!isMoleUp[index]) {
             boolean spawnImposter = false;
             if ("Medium".equalsIgnoreCase(difficulty)) {
-                // 10% chance to be an imposter in Medium
                 spawnImposter = random.nextInt(10) == 0;
             } else if ("Hard".equalsIgnoreCase(difficulty)) {
-                // 20% chance to be an imposter in Hard
                 spawnImposter = random.nextInt(5) == 0;
             }
             showMole(index, spawnImposter);
@@ -232,10 +263,9 @@ public class FragmentGame extends Fragment {
 
         moles[index].animate()
                 .translationY(0)
-                .setDuration(300)
+                .setDuration(250) // Faster pop up
                 .withEndAction(() -> {
                     if (!isGameActive) return;
-
                     handler.postDelayed(() -> {
                         if (isGameActive && isMoleUp[index]) {
                             hideMole(index);
@@ -258,31 +288,32 @@ public class FragmentGame extends Fragment {
     }
 
     private void hideMole(int index) {
-        float hideY = 200 * getResources().getDisplayMetrics().density;
+        if (!isMoleUp[index]) return; // Already going down from a hit
+
+        float hideY = moles[index].getHeight();
+        if (hideY == 0) hideY = 500;
+        
         moles[index].animate()
                 .translationY(hideY)
-                .setDuration(300)
+                .setDuration(250)
                 .withEndAction(() -> isMoleUp[index] = false);
     }
 
     private void endGame() {
         if (!isGameActive) return;
-
         isGameActive = false;
 
         if (handler != null) handler.removeCallbacksAndMessages(null);
         if (countDownTimer != null) countDownTimer.cancel();
 
-        // Stop game music
         if (gameMusic != null) {
             gameMusic.stop();
             gameMusic.release();
             gameMusic = null;
         }
 
-        // Play times up sound
         if (timesUpSoundLoaded) {
-            soundPool.play(timesUpSoundId, 1f, 1f, 0, 0, 1f);
+            soundPool.play(timesUpSoundId, 1f, 1f, 2, 0, 1f);
         }
 
         Bundle bundle = new Bundle();
@@ -290,37 +321,25 @@ public class FragmentGame extends Fragment {
         bundle.putString("difficulty", difficulty);
         bundle.putInt("imposterHits", imposterHits);
 
-        // Delay navigation para marinig muna yung sound
         handler.postDelayed(() -> {
             if (isAdded() && getView() != null) {
                 Navigation.findNavController(getView())
                         .navigate(R.id.action_fragmentGame_to_goMessageFragment, bundle);
             }
-        }, 1500);
+        }, 1200);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
         isGameActive = false;
-
-        if (handler != null) {
-            handler.removeCallbacksAndMessages(null);
-        }
-
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
-
-        // Stop game music
+        if (handler != null) handler.removeCallbacksAndMessages(null);
+        if (countDownTimer != null) countDownTimer.cancel();
         if (gameMusic != null) {
             gameMusic.stop();
             gameMusic.release();
             gameMusic = null;
         }
-
-        // Release SoundPool
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;

@@ -1,10 +1,11 @@
 package com.example.finalexer4;
 
+import android.annotation.SuppressLint;
 import android.media.AudioAttributes;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,8 +21,6 @@ public class FragmentMenu extends Fragment {
     private int selectSoundId;
     private boolean soundLoaded = false;
 
-    private MediaPlayer homeMusic;
-
     public FragmentMenu() {}
 
     @Override
@@ -30,19 +29,20 @@ public class FragmentMenu extends Fragment {
         return inflater.inflate(R.layout.fragment_menu, container, false);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Home background music
-        homeMusic = MediaPlayer.create(requireContext(), R.raw.home);
-        homeMusic.setLooping(true);
-        homeMusic.start();
+        // Ensure home music is playing (handled by MainActivity)
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).startHomeMusic();
+        }
 
-        // SoundPool para sa select button sound
         AudioAttributes attributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setFlags(AudioAttributes.FLAG_LOW_LATENCY)
                 .build();
 
         soundPool = new SoundPool.Builder()
@@ -59,19 +59,30 @@ public class FragmentMenu extends Fragment {
         Button btnMed = view.findViewById(R.id.btn_med);
         Button btnHard = view.findViewById(R.id.btn_hard);
 
-        btnEasy.setOnClickListener(v -> startGame("Easy", v));
-        btnMed.setOnClickListener(v -> startGame("Medium", v));
-        btnHard.setOnClickListener(v -> startGame("Hard", v));
+        // Instant touch response for menu buttons
+        View.OnTouchListener menuTouchListener = (v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                String difficulty = "Medium";
+                if (v.getId() == R.id.btn_easy) difficulty = "Easy";
+                else if (v.getId() == R.id.btn_hard) difficulty = "Hard";
+
+                startGame(difficulty, v);
+                return true;
+            }
+            return false;
+        };
+
+        btnEasy.setOnTouchListener(menuTouchListener);
+        btnMed.setOnTouchListener(menuTouchListener);
+        btnHard.setOnTouchListener(menuTouchListener);
     }
 
     private void startGame(String difficulty, View view) {
-        if (soundLoaded) soundPool.play(selectSoundId, 1f, 1f, 0, 0, 1f);
+        if (soundLoaded) soundPool.play(selectSoundId, 1f, 1f, 1, 0, 1f);
 
-        // Stop home music bago mag-navigate
-        if (homeMusic != null) {
-            homeMusic.stop();
-            homeMusic.release();
-            homeMusic = null;
+        // Stop home music from MainActivity before entering the game
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).stopHomeMusic();
         }
 
         Bundle bundle = new Bundle();
@@ -91,11 +102,6 @@ public class FragmentMenu extends Fragment {
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
-        }
-        if (homeMusic != null) {
-            homeMusic.stop();
-            homeMusic.release();
-            homeMusic = null;
         }
     }
 }

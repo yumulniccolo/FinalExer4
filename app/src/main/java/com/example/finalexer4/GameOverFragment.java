@@ -5,6 +5,7 @@
     import android.view.View;
     import android.view.ViewGroup;
     import android.widget.Button;
+    import android.widget.ImageView;
     import android.widget.TextView;
 
     import androidx.annotation.NonNull;
@@ -42,8 +43,19 @@
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
 
+            ImageView ivBackground = view.findViewById(R.id.ivBackground);
+
+            // Set background based on difficulty
+            if ("Easy".equalsIgnoreCase(difficulty)) {
+                ivBackground.setImageResource(R.drawable.easybg);
+            } else if ("Hard".equalsIgnoreCase(difficulty)) {
+                ivBackground.setImageResource(R.drawable.hardbg);
+            } else {
+                ivBackground.setImageResource(R.drawable.medbg);
+            }
+
             TextView tvScore = view.findViewById(R.id.textView4);
-            tvScore.setText("Score: " + score);
+            tvScore.setText(String.valueOf(score));
 
             TextView tvImposterHits = view.findViewById(R.id.tvImposterHits);
 

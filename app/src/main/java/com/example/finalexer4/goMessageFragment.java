@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +33,21 @@ public class goMessageFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         Bundle bundle = getArguments();
+        String difficulty = "Medium";
+        if (bundle != null) {
+            difficulty = bundle.getString("difficulty", "Medium");
+        }
+
+        ImageView ivBackground = view.findViewById(R.id.ivBackground);
+
+        // Set background based on difficulty
+        if ("Easy".equalsIgnoreCase(difficulty)) {
+            ivBackground.setImageResource(R.drawable.easybg);
+        } else if ("Hard".equalsIgnoreCase(difficulty)) {
+            ivBackground.setImageResource(R.drawable.hardbg);
+        } else {
+            ivBackground.setImageResource(R.drawable.medbg);
+        }
 
         // auto move after 2 seconds
         new Handler().postDelayed(() -> {
