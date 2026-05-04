@@ -1,6 +1,8 @@
 package com.example.finalexer4;
 
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -40,6 +42,13 @@ public class FragmentGame extends Fragment {
     private boolean isGameActive = true;
 
     private MediaPlayer gameMusic;
+
+    private SoundPool soundPool;
+    private int hitSoundId;
+    private boolean hitSoundLoaded = false;
+
+    private int timesUpSoundId;
+    private boolean timesUpSoundLoaded = false;
 
     public FragmentGame() {}
 
@@ -86,6 +95,27 @@ public class FragmentGame extends Fragment {
         moles[7] = view.findViewById(R.id.mole7);
         moles[8] = view.findViewById(R.id.mole8);
 
+        // Setup SoundPool
+        AudioAttributes attributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(3)
+                .setAudioAttributes(attributes)
+                .build();
+
+        hitSoundId = soundPool.load(requireContext(), R.raw.hit, 1);
+        timesUpSoundId = soundPool.load(requireContext(), R.raw.timesup, 1);
+
+        soundPool.setOnLoadCompleteListener((sp, sampleId, status) -> {
+            if (status == 0) {
+                if (sampleId == hitSoundId) hitSoundLoaded = true;
+                if (sampleId == timesUpSoundId) timesUpSoundLoaded = true;
+            }
+        });
+
         for (int i = 0; i < 9; i++) {
             final int index = i;
 
@@ -101,6 +131,7 @@ public class FragmentGame extends Fragment {
                 if (isMoleUp[index]) {
                     score++;
                     tvScore.setText("Score: " + score);
+                    if (hitSoundLoaded) soundPool.play(hitSoundId, 1f, 1f, 0, 0, 1f);
                     hideMole(index);
                 }
             });
@@ -200,14 +231,22 @@ public class FragmentGame extends Fragment {
             gameMusic = null;
         }
 
+        // Play times up sound
+        if (timesUpSoundLoaded) {
+            soundPool.play(timesUpSoundId, 1f, 1f, 0, 0, 1f);
+        }
+
         Bundle bundle = new Bundle();
         bundle.putInt("score", score);
         bundle.putString("difficulty", difficulty);
 
-        if (isAdded() && getView() != null) {
-            Navigation.findNavController(getView())
-                    .navigate(R.id.action_fragmentGame_to_goMessageFragment, bundle);
-        }
+        // Delay navigation para marinig muna yung sound
+        handler.postDelayed(() -> {
+            if (isAdded() && getView() != null) {
+                Navigation.findNavController(getView())
+                        .navigate(R.id.action_fragmentGame_to_goMessageFragment, bundle);
+            }
+        }, 1500);
     }
 
     @Override
@@ -229,6 +268,12 @@ public class FragmentGame extends Fragment {
             gameMusic.stop();
             gameMusic.release();
             gameMusic = null;
+        }
+
+        // Release SoundPool
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
         }
     }
 }
