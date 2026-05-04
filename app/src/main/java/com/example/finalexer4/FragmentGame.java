@@ -7,12 +7,16 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
 import java.util.Random;
@@ -32,6 +36,7 @@ public class FragmentGame extends Fragment {
     private Runnable gameRunnable;
     private CountDownTimer countDownTimer;
     private Random random = new Random();
+    private boolean isGameActive = true;
 
     public FragmentGame() {
         // Required empty public constructor
@@ -42,6 +47,8 @@ public class FragmentGame extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             difficulty = getArguments().getString("difficulty", "Medium");
+        } else {
+            difficulty = "Medium";
         }
     }
 
@@ -54,6 +61,16 @@ public class FragmentGame extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        ConstraintLayout layout = view.findViewById(R.id.gameLayout);
+
+        if ("Easy".equalsIgnoreCase(difficulty)) {
+            layout.setBackgroundResource(R.drawable.easybg);
+        } else if ("Hard".equalsIgnoreCase(difficulty)) {
+            layout.setBackgroundResource(R.drawable.hardbg);
+        } else {
+            layout.setBackgroundResource(R.drawable.medbg);
+        }
 
         tvScore = view.findViewById(R.id.tvScore);
         tvTime = view.findViewById(R.id.tvTime);
@@ -69,17 +86,24 @@ public class FragmentGame extends Fragment {
         moles[7] = view.findViewById(R.id.mole7);
         moles[8] = view.findViewById(R.id.mole8);
 
-        float hideY = 200 * getResources().getDisplayMetrics().density;
+        //float hideY = 200 * getResources().getDisplayMetrics().density;
 
         for (int i = 0; i < 9; i++) {
             final int index = i;
-            moles[i].setTranslationY(hideY);
-            isMoleUp[i] = false;
+
+            FrameLayout hole = (FrameLayout) moles[i].getParent();
+
+            hole.post(() -> {
+                float hideY = moles[index].getHeight();
+                moles[index].setTranslationY(hideY);
+                isMoleUp[index] = false;
+            });
+
             moles[i].setOnClickListener(v -> {
                 if (isMoleUp[index]) {
                     score++;
                     tvScore.setText("Score: " + score);
-                    hideMole(index);
+                    hideMole(index); // click = go down + score
                 }
             });
         }
@@ -133,13 +157,17 @@ public class FragmentGame extends Fragment {
     }
 
     private void showMole(int index) {
+        if (!isGameActive) return;
+
         isMoleUp[index] = true;
         moles[index].animate()
                 .translationY(0)
                 .setDuration(300)
                 .withEndAction(() -> {
+                    if (!isGameActive) return;
+
                     handler.postDelayed(() -> {
-                        if (isMoleUp[index]) {
+                        if (isGameActive && isMoleUp[index]) {
                             hideMole(index);
                         }
                     }, moleStayTime);
@@ -155,18 +183,33 @@ public class FragmentGame extends Fragment {
     }
 
     private void endGame() {
-        handler.removeCallbacks(gameRunnable);
+        if (!isGameActive) return;
+
+        isGameActive = false;
+
+        if (handler != null) handler.removeCallbacksAndMessages(null);
+        if (countDownTimer != null) countDownTimer.cancel();
+
         Bundle bundle = new Bundle();
         bundle.putInt("score", score);
-        Navigation.findNavController(requireView()).navigate(R.id.action_fragmentGame_to_gameOverFragment, bundle);
+        bundle.putString("difficulty", difficulty);
+
+        if (isAdded() && getView() != null) {
+            Navigation.findNavController(getView())
+                    .navigate(R.id.action_fragmentGame_to_goMessageFragment, bundle);
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (handler != null && gameRunnable != null) {
-            handler.removeCallbacks(gameRunnable);
+
+        isGameActive = false;
+
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
         }
+
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }

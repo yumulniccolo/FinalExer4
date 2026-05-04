@@ -7,6 +7,7 @@
     android:background="@drawable/home">
 
     <Button
+        android:id="@+id/playbtn"
         android:layout_width="63dp"
         android:layout_height="62dp"
         android:layout_marginStart="173dp"

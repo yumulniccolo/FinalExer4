@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:layout_row="3"
     android:layout_gravity="center"
+    android:id="@+id/gameLayout"
     tools:context=".FragmentGame">
 
     <TextView
@@ -39,7 +40,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole"
@@ -53,9 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front"
@@ -71,7 +71,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole1"
@@ -85,9 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front1"
@@ -103,7 +102,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole2"
@@ -117,9 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front2"
@@ -135,7 +133,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole3"
@@ -149,9 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front3"
@@ -167,7 +164,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole4"
@@ -181,9 +179,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front4"
@@ -199,7 +195,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole5"
@@ -213,9 +210,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front5"
@@ -231,7 +226,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole6"
@@ -245,9 +241,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front6"
@@ -263,7 +257,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole7"
@@ -277,9 +272,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
-                android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp"/>
+                android:src="@drawable/mole" />
 
             <ImageView
                 android:id="@+id/hole_front7"
@@ -295,7 +288,8 @@
             android:layout_height="150dp"
             android:layout_columnWeight="1"
             android:layout_gravity="bottom|center_horizontal"
-            android:clipChildren="true">
+            android:clipChildren="true"
+            android:clipToPadding="true">
 
             <ImageView
                 android:id="@+id/whole_hole8"
@@ -310,8 +304,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:src="@drawable/mole"
-                android:translationY="-11dp"
-                android:translationX="5dp" />
+                 />
 
             <ImageView
                 android:id="@+id/hole_front8"

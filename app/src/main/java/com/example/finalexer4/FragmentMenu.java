@@ -39,6 +39,12 @@ public class FragmentMenu extends Fragment {
     private void startGame(String difficulty, View view) {
         Bundle bundle = new Bundle();
         bundle.putString("difficulty", difficulty);
-        Navigation.findNavController(view).navigate(R.id.action_fragmentMenu_to_fragmentGame, bundle);
+        Navigation.findNavController(view).navigate(
+                R.id.fragmentGame,
+                bundle,
+                new androidx.navigation.NavOptions.Builder()
+                        .setPopUpTo(R.id.fragmentMenu, false) // ✅ keep menu in stack
+                        .build()
+        );
     }
 }

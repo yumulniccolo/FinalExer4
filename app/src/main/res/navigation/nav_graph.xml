@@ -1,38 +1,66 @@
-<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/fragmentMenu">
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.finalexer4.HomeFragment"
+        android:label="homepage"
+        tools:layout="@layout/homepage">
+
+        <action
+            android:id="@+id/action_homeFragment_to_fragmentMenu"
+            app:destination="@id/fragmentMenu" />
+    </fragment>
 
     <fragment
         android:id="@+id/fragmentMenu"
         android:name="com.example.finalexer4.FragmentMenu"
         android:label="fragment_menu"
-        tools:layout="@layout/fragment_menu" >
+        tools:layout="@layout/fragment_menu">
+
         <action
             android:id="@+id/action_fragmentMenu_to_fragmentGame"
             app:destination="@id/fragmentGame" />
     </fragment>
+
     <fragment
         android:id="@+id/fragmentGame"
         android:name="com.example.finalexer4.FragmentGame"
         android:label="fragment_game"
-        tools:layout="@layout/fragment_game" >
+        tools:layout="@layout/fragment_game">
+
         <action
-            android:id="@+id/action_fragmentGame_to_gameOverFragment"
+            android:id="@+id/action_fragmentGame_to_goMessageFragment"
+            app:destination="@id/goMessageFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/goMessageFragment"
+        android:name="com.example.finalexer4.goMessageFragment"
+        android:label="go_message"
+        tools:layout="@layout/fragment_go_message">
+
+        <action
+            android:id="@+id/action_goMessageFragment_to_gameOverFragment"
             app:destination="@id/gameOverFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/gameOverFragment"
         android:name="com.example.finalexer4.GameOverFragment"
         android:label="fragment_game_over"
-        tools:layout="@layout/fragment_game_over" >
+        tools:layout="@layout/fragment_game_over">
+
         <action
             android:id="@+id/action_gameOverFragment_to_fragmentGame"
             app:destination="@id/fragmentGame" />
+
         <action
             android:id="@+id/action_gameOverFragment_to_fragmentMenu"
             app:destination="@id/fragmentMenu" />
     </fragment>
+
 </navigation>
