@@ -7,7 +7,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,9 +15,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class FragmentGame extends Fragment {
@@ -129,8 +130,11 @@ public class FragmentGame extends Fragment {
         gameRunnable = new Runnable() {
             @Override
             public void run() {
+                if (!isGameActive) return;
                 showRandomMole();
-                handler.postDelayed(this, gameSpeed);
+
+                long randomOffset = random.nextInt(400) - 200;
+                handler.postDelayed(this, gameSpeed + randomOffset);
             }
         };
         handler.post(gameRunnable);
@@ -150,9 +154,24 @@ public class FragmentGame extends Fragment {
     }
 
     private void showRandomMole() {
-        int index = random.nextInt(9);
-        if (!isMoleUp[index]) {
-            showMole(index);
+        if (!isGameActive) return;
+
+        List<Integer> availableHoles = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            if (!isMoleUp[i]) availableHoles.add(i);
+        }
+        if (availableHoles.isEmpty()) return;
+
+        int maxToSpawn = 1;
+        if ("Hard".equalsIgnoreCase(difficulty)) maxToSpawn = 3;
+        else if ("Medium".equalsIgnoreCase(difficulty)) maxToSpawn = 2;
+
+        int numToSpawn = random.nextInt(maxToSpawn) + 1;
+        numToSpawn = Math.min(numToSpawn, availableHoles.size());
+
+        Collections.shuffle(availableHoles);
+        for (int i = 0; i < numToSpawn; i++) {
+            showMole(availableHoles.get(i));
         }
     }
 
@@ -175,7 +194,8 @@ public class FragmentGame extends Fragment {
     }
 
     private void hideMole(int index) {
-        float hideY = 200 * getResources().getDisplayMetrics().density;
+        float hideY = moles[index].getHeight();
+        if (hideY == 0) hideY = 500;
         moles[index].animate()
                 .translationY(hideY)
                 .setDuration(300)
