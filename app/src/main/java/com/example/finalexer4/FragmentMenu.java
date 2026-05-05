@@ -34,6 +34,13 @@ public class FragmentMenu extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Button backBtn = view.findViewById(R.id.backbtn);
+
+        backBtn.setOnClickListener(v -> {
+            Navigation.findNavController(v).popBackStack();
+
+        });
+
         // Ensure home music is playing (handled by MainActivity)
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).startHomeMusic();
